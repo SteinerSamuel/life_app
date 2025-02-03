@@ -7,6 +7,8 @@ export default function Timer() {
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [isPomo, setIsPomo] = useState<boolean>(false);
+  const [isDoro, setIsDoro] = useState<boolean>(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleSetDuration = (): void => {

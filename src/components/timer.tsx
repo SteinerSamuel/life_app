@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect, ChangeEvent } from "react";
 
 export default function Timer() {
-  const [duration, setDuration] = useState<number | string>(0);
+  const [workDuration, setWorkDuration] = useState<number | string>(0);
+  const [breakDuration, setBreakDuration] = useState<number | string>(0);
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isPaused, setIsPaused] = useState<boolean>(false);
@@ -12,11 +13,11 @@ export default function Timer() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleSetDuration = (): void => {
-    if (typeof duration === "number" && duration > 0) {
-      setTimeLeft(duration);
+    if (typeof workDuration === "number" && workDuration > 0) {
+      setTimeLeft(workDuration);
       setIsActive(false);
       setIsPaused(false);
-      console.log(duration); 
+      console.log(workDuration); 
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
@@ -84,13 +85,16 @@ export default function Timer() {
       <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 w-full max-w-md">
         <div className="flex items-center mb-6">
         <input 
-            className="bg-transparent border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+            className="bg-transparent border border-slate-200 rounded-md px-2 py-2 transition duration-300 ease [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
             id="duration"
             type="number"
             placeholder="Enter a duration"
-            value={duration}
+            value={workDuration}
             onChange={handleDurationChange}
             disabled={isActive}
+          />
+          <input
+            className="bg-transparent border border-slate-200 rounded-md px-2 py-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
           <button 
             onClick={handleSetDuration}

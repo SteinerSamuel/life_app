@@ -3,10 +3,10 @@
 import { useState, useRef, useEffect, ChangeEvent } from "react";
 
 export default function Timer() {
-  const [duration, setDuration] = useState<number | string>("");
+  const [duration, setDuration] = useState<number | string>(0);
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [isActive, setIsActive] = useState<boolean>(false);
-  const [isPaused, setisPaused] = useState<boolean>(false);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleSetDuration = (): void => {
@@ -14,6 +14,7 @@ export default function Timer() {
       setTimeLeft(duration);
       setIsActive(false);
       setIsPaused(false);
+      console.log(duration); 
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
@@ -48,7 +49,7 @@ export default function Timer() {
   
   useEffect(() => {
     if (isActive && !isPaused) {
-      timerREf.current = setInterval(() => {
+      timerRef.current = setInterval(() => {
         setTimeLeft((prevTime) => {
           if (prevTime <= 1) {
             clearINterval(timerRef.current!);
@@ -61,7 +62,7 @@ export default function Timer() {
     
     return () => {
       if (timerRef.current) {
-        clearInterval(timerREf.current);
+        clearInterval(timerRef.current);
       }
     };
   }, [isActive, isPaused]);
@@ -80,7 +81,47 @@ export default function Timer() {
   <div className="flex flex-col items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
       <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 w-full max-w-md">
         <div className="flex items-center mb-6">
-        <input className="bg-transparent border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease" placeholder="00:00" disabled={isActive}/>
+        <input 
+            className="bg-transparent border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+            id="duration"
+            type="number"
+            placeholder="Enter a duration"
+            value={duration}
+            onChange={handleDurationChange}
+            disabled={isActive}
+          />
+          <button 
+            onClick={handleSetDuration}
+            className="text-gray-800 dark:text-gray-200 border border-slate-200 px-3 py-2 rounded-md mx-2"
+          >
+          Set
+          </button>
+        </div>
+        <div className="text-6xl font-bold text-gray-800 dark:text-gray-200 mb-8 text-center">
+          {formatTime(timeLeft)}
+        </div>
+        <div className="flex justify-center gap-4">
+          <button
+            onClick={handleStart}
+            variant="outline"
+            className="text-gray-800 dark:text-gray-200"
+          >
+            {isPaused ? "Resume" : "Start"}
+          </button>
+          <button
+            onClick={handlePause}
+            variant="outline"
+            className="text-gray-800 dark:text-gray-200"
+          >
+            Pause
+          </button>
+          <button
+            onClick={handleReset}
+            variant="outline"
+            className="text-gray-800 dark:text-gray-200"
+          >
+            Reset
+          </button>
         </div>
       </div>
   </div>

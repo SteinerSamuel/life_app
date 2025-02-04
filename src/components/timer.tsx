@@ -4,8 +4,9 @@ import { useState, useRef, useEffect, ChangeEvent } from "react";
 
 export default function Timer() {
   const [workDuration, setWorkDuration] = useState<number | string>(0);
-  const [breakDuration, setBreakDuration] = useState<number | string>(0);
+  const [breakDuration, setBreakDuration] = useState<number | string>(5);
   const [timeLeft, setTimeLeft] = useState<number>(0);
+  const [pomodoro, setPomodoro] = useState<number>(0);
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [isPomo, setIsPomo] = useState<boolean>(false);
@@ -14,7 +15,7 @@ export default function Timer() {
 
   const handleSetDuration = (): void => {
     if (typeof workDuration === "number" && workDuration > 0) {
-      setTimeLeft(workDuration);
+      setTimeLeft(workDuration * 60);
       setIsActive(false);
       setIsPaused(false);
       console.log(workDuration); 
@@ -28,6 +29,10 @@ export default function Timer() {
     if (timeLeft > 0) {
       setIsActive(true);
       setIsPaused(false);
+    }
+
+    if (!isPomo && !isDoro){
+      setIsPomo(true);
     }
   };
 
@@ -44,7 +49,9 @@ export default function Timer() {
   const handleReset = (): void => {
     setIsActive(false);
     setIsPaused(false);
-    setTimeLeft(typeof duration === "number" ? duration : 0);
+    setIsPomo(false);
+    setIsDoro(false);
+    setTimeLeft(typeof workDuration === "number" ? workDuration * 60 : 0);
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
@@ -55,8 +62,17 @@ export default function Timer() {
       timerRef.current = setInterval(() => {
         setTimeLeft((prevTime) => {
           if (prevTime <= 1) {
-            clearINterval(timerRef.current!);
-            return 0;
+            if (isPomo) {
+              setIsPomo(false);
+              setIsDoro(true);
+              setTimeLeft(breakDuration * 60)
+            }
+            if (isDoro) {
+              setIsPomo(true);
+              setIsDoro(false);
+              seTimeLeft(workDuration * 60)
+            }
+            return prevTime -1
           }
           return prevTime - 1;
         });
@@ -77,28 +93,29 @@ export default function Timer() {
   };
   
   const handleDurationChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setDuration(Number(e.target.value) || "");
+    setWorkDuration(Number(e.target.value) || "");
   };
 
   return (
   <div className="flex flex-col items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
       <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 w-full max-w-md">
+        <h2> {isDoro ? "" : "Pomo" }{isPomo ? "": "Doro"} </h2> 
         <div className="flex items-center mb-6">
         <input 
-            className="bg-transparent border border-slate-200 rounded-md px-2 py-2 transition duration-300 ease [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+            className="bg-transparent border border-slate-200 rounded-md px-2 py-2 transition duration-300 ease [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none w-12" 
             id="duration"
             type="number"
-            placeholder="Enter a duration"
+            placeholder="0"
             value={workDuration}
             onChange={handleDurationChange}
-            disabled={isActive}
+            disabled={isPomo || isDoro}
           />
           <input
-            className="bg-transparent border border-slate-200 rounded-md px-2 py-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            className="bg-transparent border border-slate-200 rounded-md px-2 py-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none w-12 mx-2"
           />
           <button 
             onClick={handleSetDuration}
-            className="text-gray-800 dark:text-gray-200 border border-slate-200 px-3 py-2 rounded-md mx-2"
+            className="text-gray-800 dark:text-gray-200 border border-slate-200 px-3 py-2 rounded-md mx-1"
           >
           Set
           </button>

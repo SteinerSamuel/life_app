@@ -4,9 +4,10 @@ import { useState, useRef, useEffect, ChangeEvent } from "react";
 
 export default function Timer() {
   const [workDuration, setWorkDuration] = useState<number | string>(0);
-  const [breakDuration, setBreakDuration] = useState<number | string>(5);
+  const [breakDuration, setBreakDuration] = useState<number | string>(0);
   const [timeLeft, setTimeLeft] = useState<number>(0);
-  const [pomodoro, setPomodoro] = useState<number>(0);
+  const [pomoCounter, setPomoCounter] = useState<number>(0);
+  const [doroCounter, setDoroCounter] = useState<number>(0);
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [isPomo, setIsPomo] = useState<boolean>(false);
@@ -51,6 +52,8 @@ export default function Timer() {
     setIsPaused(false);
     setIsPomo(false);
     setIsDoro(false);
+    setPomoCounter(0);
+    setDoroCounter(0);
     setTimeLeft(typeof workDuration === "number" ? workDuration * 60 : 0);
     if (timerRef.current) {
       clearInterval(timerRef.current);
@@ -62,17 +65,25 @@ export default function Timer() {
       timerRef.current = setInterval(() => {
         setTimeLeft((prevTime) => {
           if (prevTime <= 1) {
+            console.log(isPomo);
+            console.log(isDoro);
+            
+            setIsActive(false);
+            setIsPaused(true);
+            reset = true;
+            
             if (isPomo) {
               setIsPomo(false);
               setIsDoro(true);
-              setTimeLeft(breakDuration * 60)
+              setPomoCounter(pomoCounter + 1);
+              setTimeLeft(breakDuration * 60);
             }
             if (isDoro) {
               setIsPomo(true);
               setIsDoro(false);
-              seTimeLeft(workDuration * 60)
+              setDoroCounter(doroCounter + 1);
+              setTimeLeft(workDuration * 60);
             }
-            return prevTime -1
           }
           return prevTime - 1;
         });
@@ -92,10 +103,14 @@ export default function Timer() {
     return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
   };
   
-  const handleDurationChange = (e: ChangeEvent<HTMLInputElement>): void => {
+  const handleWorkDurationChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setWorkDuration(Number(e.target.value) || "");
   };
 
+  const handleBreakDurationChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    setBreakDuration(Number(e.target.value) || "");
+  };
+  
   return (
   <div className="flex flex-col items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
       <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 w-full max-w-md">
@@ -107,12 +122,18 @@ export default function Timer() {
             type="number"
             placeholder="0"
             value={workDuration}
-            onChange={handleDurationChange}
+            onChange={handleWorkDurationChange}
             disabled={isPomo || isDoro}
           />
           <input
             className="bg-transparent border border-slate-200 rounded-md px-2 py-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none w-12 mx-2"
-          />
+            id="duration"
+            type="number"
+            placeholder="0"
+            value={breakDuration}
+            onChange={handleBreakDurationChange}
+            disabled={isPomo || isDoro}
+        />
           <button 
             onClick={handleSetDuration}
             className="text-gray-800 dark:text-gray-200 border border-slate-200 px-3 py-2 rounded-md mx-1"
@@ -146,6 +167,7 @@ export default function Timer() {
             Reset
           </button>
         </div>
+      You've done {pomoCounter} work periods and {doroCounter} break periods
       </div>
   </div>
   )

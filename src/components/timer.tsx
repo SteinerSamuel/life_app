@@ -62,32 +62,34 @@ export default function Timer() {
   
   useEffect(() => {
     if (isActive && !isPaused) {
+      
       timerRef.current = setInterval(() => {
         setTimeLeft((prevTime) => {
           if (prevTime <= 1) {
             console.log(isPomo);
             console.log(isDoro);
             
-            setIsActive(false);
-            setIsPaused(true);
-            reset = true;
+            // setIsActive(false);
+            // setIsPaused(true);
             
             if (isPomo) {
-              setIsPomo(false);
-              setIsDoro(true);
+              setIsPomo(() => false);
+              setIsDoro(() => true);
               setPomoCounter(pomoCounter + 1);
               setTimeLeft(breakDuration * 60);
-            }
-            if (isDoro) {
-              setIsPomo(true);
-              setIsDoro(false);
+              return
+            } else {
+              setIsPomo(() => true);
+              setIsDoro(() => false);
               setDoroCounter(doroCounter + 1);
               setTimeLeft(workDuration * 60);
+              return
             }
           }
           return prevTime - 1;
         });
       }, 1000);
+      return
     }
     
     return () => {
